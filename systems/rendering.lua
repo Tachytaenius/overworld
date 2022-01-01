@@ -4,7 +4,7 @@ local spriteTypes = require("registry.spriteTypes")
 
 local quadreasonable = require("lib.quadreasonable")
 local concord = require("lib.concord")
-local rendering = concord.system({cameras = {"camera"}, pool = {"sprite", "position"}})
+local rendering = concord.system({cameras = {"camera"}, sprites = {"sprite", "position"}, interactors = {"interacting"}})
 
 function rendering:init()
 	self.output = love.graphics.newCanvas(consts.gameCanvasWidth, consts.gameCanvasHeight)
@@ -44,7 +44,24 @@ function rendering:draw()
 			love.graphics.draw(assets.terrain[tile.type], x * consts.tileSize, y * consts.tileSize)
 		end
 	end
-	for _, e in ipairs(self.pool) do
+	
+	
+	for _, e in ipairs(self.interactors) do
+		if e.interacting.type == "cracks" then
+			local x, y = e.interacting.tileX * consts.tileSize, e.interacting.tileY * consts.tileSize
+			if e.interacting.progress > 0.75 then
+				love.graphics.draw(assets.terrain.damage[3], x, y)
+			elseif e.interacting.progress > 0.5 then
+				love.graphics.draw(assets.terrain.damage[2], x, y)
+			elseif e.interacting.progress > 0.25 then
+				love.graphics.draw(assets.terrain.damage[1], x, y)
+			else
+				
+			end
+		end
+	end
+	
+	for _, e in ipairs(self.sprites) do
 		local spriteType = spriteTypes[e.sprite.val]
 		local image = assets.sprites[e.sprite.val]
 		local quad = quadreasonable.getQuad(
@@ -70,6 +87,8 @@ function rendering:draw()
 		-- love.graphics.rectangle("line", e.position.x-a, e.position.y-a, a*2, a*2)
 		-- love.graphics.points(e.position.x, e.position.y)
 	end
+	
+	
 	
 	love.graphics.setCanvas()
 	love.graphics.origin()

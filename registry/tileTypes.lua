@@ -19,6 +19,8 @@ local tileTypes = {
 		collision = true,
 		interact = {
 			axe = {
+				baseTime = 5,
+				displayType = "healthBar",
 				items = {wood=3,foliage=4},
 				newTile = "treeStump"
 			}
@@ -29,6 +31,7 @@ local tileTypes = {
 		collision = false,
 		interact = {
 			shovel = {
+				baseTime = 8,
 				items = {wood=1},
 				newTile = "grass"
 			}
@@ -43,9 +46,19 @@ local tileTypes = {
 			}
 		}
 	},
-	
+	dirt = {
+		collision = false
+	},
 	rock = {
-		collision = true
+		collision = true,
+		interact = {
+			pickaxe = {
+				displayType = "cracks",
+				baseTime = 12,
+				items = {pebbles=20},
+				newTile = "dirt"
+			}
+		}
 	}
 }
 

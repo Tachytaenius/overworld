@@ -1,5 +1,5 @@
 local concord = require("lib.concord")
-return concord.component("inventory", function(c, startItems, currentTool)
+return concord.component("inventory", function(c, startItems, currentItem)
 	c.items = startItems or {}
-	c.currentTool = currentTool or "none"
+	c.currentItem = currentItem
 end)

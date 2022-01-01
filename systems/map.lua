@@ -1,19 +1,20 @@
 local consts = require("consts")
 local tileTypes = require("registry.tileTypes")
+local itemTypes = require("registry.itemTypes")
 
 local concord = require("lib.concord")
-local map = concord.system({interactors = {"will", "position", "inventory"}})
+local map = concord.system({interactors = {"will", "position"}})
 
 function map:pointColliding(x, y)
 	local tileX, tileY = math.floor(x / consts.tileSize), math.floor(y / consts.tileSize)
 	
-	-- if not (
-	--   0 <= tileX and tileX < self.width and
-	--   0 <= tileY and tileY < self.height
-	-- ) then
-	-- 	return true
-	-- end
-	tileX, tileY = tileX % self.width, tileY % self.height
+	if not (
+	  0 <= tileX and tileX < self.width and
+	  0 <= tileY and tileY < self.height
+	) then
+		return true
+	end
+	-- tileX, tileY = tileX % self.width, tileY % self.height
 	
 	local tileType = tileTypes[self.tiles[tileX][tileY].type]
 	if tileType.collision then
@@ -76,23 +77,41 @@ end
 
 function map:update(dt)
 	for _, e in ipairs(self.interactors) do
-		if e.will.interaction then
+		if not e.will.interaction then
+			e:remove("interacting")
+		else
+			if e.interacting then
+				if not (e.will.interactionTileX == e.interacting.tileX and e.will.interactionTileY == e.interacting.tileY) then
+					e:remove("interacting")
+				end
+			end
 			local tile = self.tiles[e.will.interactionTileX][e.will.interactionTileY]
-			local interactionBlueprint = tileTypes[tile.type].interact and tileTypes[tile.type].interact[e.inventory.currentTool]
+			local currentItem = e.inventory and e.inventory.currentItem
+			local interactionType = itemTypes[currentItem] and itemTypes[currentItem].interactionType or "none"
+			local interactionBlueprint = tileTypes[tile.type].interact and tileTypes[tile.type].interact[interactionType]
 			if interactionBlueprint then
-				tile.type = interactionBlueprint.newTile
-				for getItem, getQuantity in ipairs(interactionBlueprint.items) do
-					local newStackRequired = true
-					for _, stack in ipairs(e.inventory.items) do
-						local haveItem, haveQuantity = stack.item, stack.quantity
-						if haveItem == getItem then
-							newStackRequired = false
-							stack.quantity=getQuantity+haveQuantity
-							break
+				if not e.interacting then
+					e:give("interacting", e.will.interactionTileX, e.will.interactionTileY, interactionBlueprint.displayType)
+				end
+				e.interacting.progress = e.interacting.progress + dt / (interactionBlueprint.baseTime or 0) * (itemTypes[currentTool] and itemTypes[currentTool].interactionSpeed or 1)
+				-- that'd make a NaN without baseTime but that's of no consequence
+				if not interactionBlueprint.baseTime or interactionBlueprint.baseTime == 0 or e.interacting.progress >= 1 then
+					e:remove("interacting")
+					-- map interaction completed, make the changes
+					tile.type = interactionBlueprint.newTile
+					for getItem, getQuantity in ipairs(interactionBlueprint.items) do
+						local newStackRequired = true
+						for _, stack in ipairs(e.inventory.items) do
+							local haveItem, haveQuantity = stack.item, stack.quantity
+							if haveItem == getItem then
+								newStackRequired = false
+								stack.quantity=getQuantity+haveQuantity
+								break
+							end
 						end
-					end
-					if newStackRequired then
-						table.insert(e.inventory.items, {item = getItem, quantity = getQuantity})
+						if newStackRequired then
+							table.insert(e.inventory.items, {item = getItem, quantity = getQuantity})
+						end
 					end
 				end
 			end

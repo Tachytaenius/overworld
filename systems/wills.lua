@@ -31,7 +31,6 @@ function wills:update(dt)
 		if magnitude > 0 then
 			moveX, moveY = moveX / magnitude, moveY / magnitude
 		end
-		local lastMoveX, lastMoveY = e.will.moveX, e.will.moveY
 		e.will.moveX, e.will.moveY = moveX, moveY
 		
 		local tryNorth, trySouth, tryWest, tryEast =
@@ -46,7 +45,20 @@ function wills:update(dt)
 			  tryWest and "west"
 		else
 			e.will.facingDirection = e.walk.facingDirection
+			local fDir = e.will.facingDirection
+			-- if you go from not moving to moving diagonally in one frame you can walk backwards, this prevents that:
+			if fDir == "north" and not tryNorth then
+				e.will.facingDirection = "south"
+			elseif fDir == "east" and not tryEast then
+				e.will.facingDirection = "west"
+			elseif fDir == "south" and not trySouth then
+				e.will.facingDirection = "north"
+			elseif fDir == "west" and not tryWest then
+				e.will.facingDirection = "east"
+			end
 		end
+		
+		-- Old attempts, old systems, this might have been aiming for a different effect
 		
 		-- local fDir = e.walk.facingDirection
 		-- local fDirLND = e.walk.facingDirectionLastNonDiagonalMovement
@@ -116,8 +128,14 @@ function wills:update(dt)
 					end
 				end
 			end
-			e.will.interactionTileX = math.floor(x / consts.tileSize) % self:getWorld().map.width
-			e.will.interactionTileY = math.floor(y / consts.tileSize) % self:getWorld().map.height
+			-- e.will.interactionTileX = math.floor(x / consts.tileSize) % self:getWorld().map.width
+			-- e.will.interactionTileY = math.floor(y / consts.tileSize) % self:getWorld().map.height
+			e.will.interactionTileX = math.floor(x / consts.tileSize)
+			e.will.interactionTileY = math.floor(y / consts.tileSize)
+			if e.will.interactionTileX < 0 or e.will.interactionTileX >= self:getWorld().map.width or e.will.interactionTileY < 0 or e.will.interactionTileY >= self:getWorld().map.height then
+				e.will.interaction = false
+				-- e.will.interactionTileX, e.will.interactionTileY = nil
+			end
 		end
 	end
 end
