@@ -2,14 +2,15 @@ local function isBlinking(e)
 	return not e.life or e.blink.curCycleTimer < e.blink.curBlinkLength
 end
 
-local spriteTypes = {
+local spritesheetTypes = {
 	islandGuy = {
 		size = 16,
 		walkCycleStages = 4,
 		poses = 4, -- shaved, shaved blinking, bearded, bearded blinking
 		yOffset = -2,
 		poseOffsetToUse = function(e)
-			return "shaved" and 0
+			local blink = isBlinking(e)
+			return blink and 1 or 0
 		end
 	},
 	player = {
@@ -28,4 +29,4 @@ local spriteTypes = {
 	-- }
 }
 
-return spriteTypes
+return spritesheetTypes

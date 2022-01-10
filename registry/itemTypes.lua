@@ -5,7 +5,10 @@ local itemTypes = {
 	},
 	stonePickaxe = {
 		interactionType = "pickaxe"
-	}
+	},
+	
+	pebble = {},
+	cobble = {}
 }
 
 return itemTypes

@@ -3,6 +3,7 @@ local tileTypes = require("registry.tileTypes")
 local itemTypes = require("registry.itemTypes")
 
 local concord = require("lib.concord")
+local assemblages = require("assemblages")
 local map = concord.system({interactors = {"will", "position"}})
 
 function map:pointColliding(x, y)
@@ -52,29 +53,25 @@ function map:newWorld(width, height)
 		tiles[x] = column
 		for y = 0, height - 1 do
 			local tile = {}
-			local randomVal = love.math.random()
 			local type
-			if love.math.random() < 0.98 then
-				local noiseVal = love.math.noise(x / 50, y / 50) ^ 2
-				if love.math.random() < noiseVal then
-					type = "tree"
-				else
-					type = love.math.random() < 0.1 and "floweredGrass" or love.math.random() < 0.05 and "pebbledGrass" or "grass"
-				end
-			else
+			local vegetation = love.math.noise(x / 50, y / 50, 0) ^ 2
+			local rockiness = love.math.noise(x / 100, y / 100, 1) ^ 6
+			if love.math.random() * 10 < rockiness then
 				type = "rock"
+			elseif love.math.random() * 4 < vegetation then
+				type = "floweredGrass"
+			elseif love.math.random() / 2 + 0.15 < vegetation then
+				type = "tree"
+			else
+				type = "grass"
 			end
 			tile.type = type
 			column[y] = tile
-			-- tile.type =
-			--   randomVal < 0.01 and "rock" or
-			--   randomVal < 0.25 and "floweredGrass" or
-			--   randomVal < 0.30 and "tree" or
-			--   "grass"
 		end
 	end
 end
 
+-- NOTE in case it changes: this method is mentioned in registry/tileTypes.lua as the place where tiles turn to items
 function map:update(dt)
 	for _, e in ipairs(self.interactors) do
 		if not e.will.interaction then
@@ -87,7 +84,7 @@ function map:update(dt)
 			end
 			local tile = self.tiles[e.will.interactionTileX][e.will.interactionTileY]
 			local currentItem = e.inventory and e.inventory.currentItem
-			local interactionType = itemTypes[currentItem] and itemTypes[currentItem].interactionType or "none"
+			local interactionType = itemTypes[currentItem.type] and itemTypes[currentItem.type].interactionType or "none"
 			local interactionBlueprint = tileTypes[tile.type].interact and tileTypes[tile.type].interact[interactionType]
 			if interactionBlueprint then
 				if not e.interacting then
@@ -99,18 +96,18 @@ function map:update(dt)
 					e:remove("interacting")
 					-- map interaction completed, make the changes
 					tile.type = interactionBlueprint.newTile
-					for getItem, getQuantity in ipairs(interactionBlueprint.items) do
-						local newStackRequired = true
-						for _, stack in ipairs(e.inventory.items) do
-							local haveItem, haveQuantity = stack.item, stack.quantity
-							if haveItem == getItem then
-								newStackRequired = false
-								stack.quantity=getQuantity+haveQuantity
-								break
+					for _, itemStack in ipairs(interactionBlueprint.items) do
+						for _=1, itemStack.quantity do
+							local itemToAdd = {}
+							for k, v in pairs(itemStack) do
+								itemToAdd[k] = v
 							end
-						end
-						if newStackRequired then
-							table.insert(e.inventory.items, {item = getItem, quantity = getQuantity})
+							itemToAdd.quantity = nil
+							local x, y =
+							  (e.will.interactionTileX + love.math.random()) * consts.tileSize,
+							  (e.will.interactionTileY + love.math.random()) * consts.tileSize
+							local entityToAdd = concord.entity():assemble(assemblages.item, x, y, itemToAdd)
+							self:getWorld():addEntity(entityToAdd)
 						end
 					end
 				end

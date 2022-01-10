@@ -33,28 +33,32 @@ function wills:update(dt)
 		end
 		e.will.moveX, e.will.moveY = moveX, moveY
 		
-		local tryNorth, trySouth, tryWest, tryEast =
-		  moveY < 0, moveY > 0,
-		  moveX < 0, moveX > 0
-		
-		if moveX == 0 or moveY == 0 then
-			e.will.facingDirection =
-			  tryNorth and "north" or
-			  trySouth and "south" or
-			  tryEast and "east" or
-			  tryWest and "west"
-		else
+		if love.keyboard.isDown(settings.commands.retainDirection) then
 			e.will.facingDirection = e.walk.facingDirection
-			local fDir = e.will.facingDirection
-			-- if you go from not moving to moving diagonally in one frame you can walk backwards, this prevents that:
-			if fDir == "north" and not tryNorth then
-				e.will.facingDirection = "south"
-			elseif fDir == "east" and not tryEast then
-				e.will.facingDirection = "west"
-			elseif fDir == "south" and not trySouth then
-				e.will.facingDirection = "north"
-			elseif fDir == "west" and not tryWest then
-				e.will.facingDirection = "east"
+		else
+			local tryNorth, trySouth, tryWest, tryEast =
+			  moveY < 0, moveY > 0,
+			  moveX < 0, moveX > 0
+			
+			if moveX == 0 or moveY == 0 then
+				e.will.facingDirection =
+				  tryNorth and "north" or
+				  trySouth and "south" or
+				  tryEast and "east" or
+				  tryWest and "west"
+			else
+				e.will.facingDirection = e.walk.facingDirection
+				local fDir = e.will.facingDirection
+				-- if you go from not moving to moving diagonally in one frame you can walk backwards, this prevents that:
+				if fDir == "north" and not tryNorth then
+					e.will.facingDirection = "south"
+				elseif fDir == "east" and not tryEast then
+					e.will.facingDirection = "west"
+				elseif fDir == "south" and not trySouth then
+					e.will.facingDirection = "north"
+				elseif fDir == "west" and not tryWest then
+					e.will.facingDirection = "east"
+				end
 			end
 		end
 		

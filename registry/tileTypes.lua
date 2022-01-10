@@ -1,3 +1,5 @@
+-- item stacks don't exist in the game. an entry like {type = "flower", quantity = 5} is copied 5 times with the quantity key removed. NOTE: shallow copy! If deep copy is needed later (i.e. if the structure of an item deepens) then the place to edit is systems/map.lua's map:update
+
 local tileTypes = {
 	grass = {
 		collision = false
@@ -6,7 +8,7 @@ local tileTypes = {
 		collision = false,
 		interact = {
 			none = {
-				items = {flower=5},
+				items = {{type = "flower", quantity = 5}},
 				newTile = "grass"
 			}
 		}
@@ -21,7 +23,7 @@ local tileTypes = {
 			axe = {
 				baseTime = 5,
 				displayType = "healthBar",
-				items = {wood=3,foliage=4},
+				items = {{type = "wood", quantity = 3}, {type = "foliage", quantity = 4}},
 				newTile = "treeStump"
 			}
 		}
@@ -32,20 +34,20 @@ local tileTypes = {
 		interact = {
 			shovel = {
 				baseTime = 8,
-				items = {wood=1},
+				items = {{type = "wood", quantity = 1}},
 				newTile = "grass"
 			}
 		}
 	},
-	pebbledGrass = {
-		collision = false,
-		interact = {
-			none = {
-				items = {pebbles=4},
-				newTile = "grass"
-			}
-		}
-	},
+	-- pebbledGrass = {
+	-- 	collision = false,
+	-- 	interact = {
+	-- 		none = {
+	-- 			items = {pebbles=4},
+	-- 			newTile = "grass"
+	-- 		}
+	-- 	}
+	-- },
 	dirt = {
 		collision = false
 	},
@@ -55,7 +57,7 @@ local tileTypes = {
 			pickaxe = {
 				displayType = "cracks",
 				baseTime = 12,
-				items = {pebbles=20},
+				items = {{type = "cobble", quantity = 4}, {type = "pebble", quantity = 2}},
 				newTile = "dirt"
 			}
 		}

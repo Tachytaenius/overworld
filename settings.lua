@@ -7,8 +7,10 @@ settings.commands = {
 	down = "s",
 	left = "a",
 	right = "d",
-	
+	retainDirection = "lshift",
 	useTool = "space",
+	
+	openCloseInventory = "i",
 	
 	toggleFullscreen = "f11",
 	scaleUp = "f10",
@@ -16,7 +18,7 @@ settings.commands = {
 }
 
 settings.graphics = {
-	scale = 2,
+	scale = 3,
 	fullscreen = false
 }
 

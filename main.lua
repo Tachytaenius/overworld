@@ -21,22 +21,23 @@ function love.load(arg)
 	-- world.initialTreeCount = 1000
 	world
 	  -- :addSystem(systems.plants)
+	  :addSystem(systems.inventory)
 	  :addSystem(systems.metabolism)
 	  :addSystem(systems.wills)
 	  :addSystem(systems.movement)
 	  :addSystem(systems.map)
 	  :addSystem(systems.rendering)
-	world:emit("newWorld", 64, 64)
+	world:emit("newWorld", 512, 512)
 	local player = concord.entity()
 	player
-	  :give("position", 8, 8)
+	  :give("position", world.map.width*consts.tileSize/2+8, world.map.height*consts.tileSize/2+8)
 	  :give("presence", 14)
 	  :give("walk", 64)
 	  :give("will")
-	  :give("sprite", "player")
+	  :give("spritesheet", "islandGuy")
 	  :give("player")
 	  :give("camera")
-	  :give("inventory", nil, "stonePickaxe")
+	  :give("inventory", 5, nil, {type="stonePickaxe"})
 	  :give("reach", 6)
 	  :give("blink", 4, 1, 0.25, 0.1)
 	  :give("life")
@@ -55,6 +56,12 @@ function love.draw()
 	  love.graphics.getHeight()/2 - (consts.gameCanvasHeight*settings.graphics.scale)/2,
 	  0, settings.graphics.scale
 	)
+end
+
+function love.keypressed(key, scancode)
+	if key == settings.commands.openCloseInventory then
+		world.inventory.toggleCommandSent = true -- gets false'd after being received
+	end
 end
 
 function love.keyreleased(key, scancode)

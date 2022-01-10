@@ -106,6 +106,5 @@ if world.map:hitboxColliding(x,y+dy,w,h) then
 	dy = 0
 end
 if world.map:hitboxColliding(x+dx,y+dy,w,h) then
-	print(x+dx)
 	dx, dy = 0, 0
 end
