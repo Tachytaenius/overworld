@@ -17,7 +17,7 @@ local inventoryPaddingBLQuad = love.graphics.newQuad(0, 16, 8, 8, assets.ui.inve
 local inventoryPaddingBQuad = love.graphics.newQuad(8, 16, 8, 8, assets.ui.inventoryTiles)
 local inventoryPaddingBRQuad = love.graphics.newQuad(16, 16, 8, 8, assets.ui.inventoryTiles)
 -- x and y are the top left of the first item square, not the padding
-local function drawInventoryGrid(x, y, width, height, items, itemCount)
+function rendering:drawInventoryGrid(x, y, width, height, items, itemCount)
 	itemCount = itemCount or width * height
 	love.graphics.push()
 	love.graphics.translate(x, y)
@@ -27,6 +27,9 @@ local function drawInventoryGrid(x, y, width, height, items, itemCount)
 			love.graphics.draw(assets.ui.inventoryTiles, i > itemCount and inventorySlotlessSquareQuad or inventorySlotSquareQuad, x*8, y*8)
 			local item = items[i]
 			if item then
+				if item.item then -- entity, as in the pickupables menu, or just in an inventory?
+					item = item.item.val
+				end
 				love.graphics.draw(assets.items[item.type], x*8, y*8)
 			end
 		end
@@ -119,6 +122,7 @@ function rendering:draw()
 		  math.round(e.position.x-consts.itemSize/2),
 		  math.round(e.position.y-consts.itemSize/2)
 		love.graphics.draw(assets.items[e.item.val.type], x, y)
+		-- love.graphics.points(e.position.x, e.position.y)
 	end
 	
 	for _, e in ipairs(self.spritesheets) do
@@ -154,7 +158,12 @@ function rendering:draw()
 	-- HUD
 	
 	if cameraEntity.inventory and cameraEntity.inventory.isOpen then
-		drawInventoryGrid(6, 6, 1, 1, {cameraEntity.inventory.currentItem})
+		self:drawInventoryGrid(6, 6, 1, 1, {cameraEntity.inventory.currentItem})
+		if self:getWorld().ui then
+			if self:getWorld().ui.inventoryGrid then
+				self:drawInventoryGrid(unpack(self:getWorld().ui.inventoryGrid))
+			end
+		end
 	end
 	
 	love.graphics.setCanvas()

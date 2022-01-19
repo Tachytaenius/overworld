@@ -110,25 +110,25 @@ function wills:update(dt)
 				if e.presence then
 					local a = e.presence.apothem
 					if fDir == "north" then
-						y=y-a-e.reach.val
+						y=y-a-e.reach.interactionLength
 					elseif fDir == "south" then
-						y=y+a+e.reach.val
+						y=y+a+e.reach.interactionLength
 					elseif fDir == "east" then
-						x=x+a+e.reach.val
+						x=x+a+e.reach.interactionLength
 					-- elseif fDir == "west" then
 					else
-						x=x-a-e.reach.val
+						x=x-a-e.reach.interactionLength
 					end
 				else
 					if fDir == "north" then
-						y=y-e.reach.val
+						y=y-e.reach.interactionLength
 					elseif fDir == "south" then
-						y=y+e.reach.val
+						y=y+e.reach.interactionLength
 					elseif fDir == "east" then
-						x=x+e.reach.val
+						x=x+e.reach.interactionLength
 					-- elseif fDir == "west" then
 					else
-						x=x-e.reach.val
+						x=x-e.reach.interactionLength
 					end
 				end
 			end
