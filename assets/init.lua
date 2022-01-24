@@ -4,7 +4,8 @@ local newImage = love.graphics.newImage
 
 local assets = {
 	ui = {
-		inventoryTiles = newImage("assets/ui/inventoryTiles.png")
+		inventoryTiles = newImage("assets/ui/inventoryTiles.png"),
+		itemSelector = newImage("assets/ui/itemSelector.png")
 	},
 	spritesheets = {
 		islandGuy = newImage("assets/spritesheets/islandGuy.png"),

@@ -56,7 +56,7 @@ local tileTypes = {
 		interact = {
 			pickaxe = {
 				displayType = "cracks",
-				baseTime = 12,
+				baseTime = 1,
 				items = {{type = "cobble", quantity = 4}, {type = "pebble", quantity = 2}},
 				newTile = "dirt"
 			}

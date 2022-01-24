@@ -28,7 +28,7 @@ function love.load(arg)
 	  :addSystem(systems.movement)
 	  :addSystem(systems.map)
 	  :addSystem(systems.rendering)
-	world:emit("newWorld", 512, 512)
+	world:emit("newWorld", 1024, 1024)
 	local player = concord.entity()
 	player
 	  :give("position", world.map.width*consts.tileSize/2+8, world.map.height*consts.tileSize/2+8)
@@ -62,6 +62,16 @@ end
 function love.keypressed(key, scancode)
 	if key == settings.commands.openCloseInventory then
 		world.inventory.toggleCommandSent = true -- gets false'd after being received
+	elseif key == settings.commands.uiLeft then
+		world.ui.selectorMove = "left" -- cleared every frame
+	elseif key == settings.commands.uiRight then
+		world.ui.selectorMove = "right"
+	elseif key == settings.commands.uiUp then
+		world.ui.selectorMove = "up"
+	elseif key == settings.commands.uiDown then
+		world.ui.selectorMove = "down"
+	elseif key == settings.commands.uiSelect then
+		world.ui.select = true
 	end
 end
 

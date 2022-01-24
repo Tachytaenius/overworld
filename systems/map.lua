@@ -66,9 +66,29 @@ function map:newWorld(width, height)
 				type = "grass"
 			end
 			tile.type = type
+			if love.math.random() * 8 < rockiness then
+				if not tileTypes[type].collision then
+					if love.math.random() < 0.75 then
+						self:addItemToTile(x, y, "pebble")
+						if love.math.random() < 0.1 then
+							self:addItemToTile(x, y, "pebble")
+						end
+					else
+						self:addItemToTile(x, y, "cobble")
+					end
+				end
+			end
 			column[y] = tile
 		end
 	end
+end
+
+function map:addItemToTile(x, y, item)
+	local x2, y2 =
+	  (x + love.math.random()) * consts.tileSize,
+	  (y + love.math.random()) * consts.tileSize
+	local entityToAdd = concord.entity():assemble(assemblages.item, x2, y2, item)
+	self:getWorld():addEntity(entityToAdd)
 end
 
 -- NOTE in case it changes: this method is mentioned in registry/tileTypes.lua as the place where tiles turn to items
@@ -103,11 +123,7 @@ function map:update(dt)
 								itemToAdd[k] = v
 							end
 							itemToAdd.quantity = nil
-							local x, y =
-							  (e.will.interactionTileX + love.math.random()) * consts.tileSize,
-							  (e.will.interactionTileY + love.math.random()) * consts.tileSize
-							local entityToAdd = concord.entity():assemble(assemblages.item, x, y, itemToAdd)
-							self:getWorld():addEntity(entityToAdd)
+							self:addItemToTile(e.will.interactionTileX, e.will.interactionTileY, itemToAdd)
 						end
 					end
 				end

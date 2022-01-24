@@ -17,7 +17,7 @@ local inventoryPaddingBLQuad = love.graphics.newQuad(0, 16, 8, 8, assets.ui.inve
 local inventoryPaddingBQuad = love.graphics.newQuad(8, 16, 8, 8, assets.ui.inventoryTiles)
 local inventoryPaddingBRQuad = love.graphics.newQuad(16, 16, 8, 8, assets.ui.inventoryTiles)
 -- x and y are the top left of the first item square, not the padding
-function rendering:drawInventoryGrid(x, y, width, height, items, itemCount)
+function rendering:drawInventoryGrid(x, y, width, height, items, itemCount, highlightedItemIndex)
 	itemCount = itemCount or width * height
 	love.graphics.push()
 	love.graphics.translate(x, y)
@@ -45,6 +45,11 @@ function rendering:drawInventoryGrid(x, y, width, height, items, itemCount)
 	for y = 0, height - 1 do
 		love.graphics.draw(assets.ui.inventoryTiles, inventoryPaddingLQuad, -8, y*8)
 		love.graphics.draw(assets.ui.inventoryTiles, inventoryPaddingRQuad, width*8, y*8)
+	end
+	if highlightedItemIndex then
+		local x = (highlightedItemIndex - 1) % width
+		local y = math.floor((highlightedItemIndex - 1) / width)
+		love.graphics.draw(assets.ui.itemSelector, x*8-4, y*8-4)
 	end
 	love.graphics.pop()
 end

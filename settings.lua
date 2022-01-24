@@ -11,6 +11,11 @@ settings.commands = {
 	useTool = "space",
 	
 	openCloseInventory = "i",
+	uiUp = "up",
+	uiDown = "down",
+	uiLeft = "left",
+	uiRight = "right",
+	uiSelect = "return",
 	
 	toggleFullscreen = "f11",
 	scaleUp = "f10",
