@@ -72,6 +72,8 @@ function love.keypressed(key, scancode)
 		world.ui.selectorMove = "down"
 	elseif key == settings.commands.uiSelect then
 		world.ui.select = true
+	elseif key == settings.commands.uiChangeView then
+		world.ui.changeGrid = true
 	end
 end
 

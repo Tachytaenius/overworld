@@ -15,15 +15,22 @@ function inventory:update(dt)
 	end
 	local pickupables = {}
 	for _, e in ipairs(self.pickuppers) do
-		local ePickupables = {}
-		local ex, ey = e.position.x, e.position.y
-		for _, e2 in ipairs(self.items) do
-			local dist = math.sqrt((ex - e2.position.x)^2 + (ey - e2.position.y)^2)
-			if dist <= e.reach.itemPickupLength then
-				ePickupables[#ePickupables+1] = e2
+		if e.inventory.isOpen then
+			local ePickupables = {}
+			local ex, ey = e.position.x, e.position.y
+			for _, e2 in ipairs(self.items) do
+				local dist = math.sqrt((ex - e2.position.x)^2 + (ey - e2.position.y)^2)
+				if dist <= e.reach.itemPickupLength then
+					ePickupables[#ePickupables+1] = e2
+				end
 			end
+			table.sort(ePickupables, function(a, b)
+				local distA = math.sqrt((ex - a.position.x)^2 + (ey - a.position.y)^2)
+				local distB = math.sqrt((ex - b.position.x)^2 + (ey - b.position.y)^2)
+				return distA < distB
+			end)
+			pickupables[e] = ePickupables
 		end
-		pickupables[e] = ePickupables
 	end
 	if cameraEntity and cameraEntity.inventory and cameraEntity.position and cameraEntity.reach and cameraEntity.will then
 		self:getWorld().ui.cameraPickupables = pickupables[cameraEntity] -- cleared every frame in case there is no longer a camera pickupper

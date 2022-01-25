@@ -16,6 +16,7 @@ settings.commands = {
 	uiLeft = "left",
 	uiRight = "right",
 	uiSelect = "return",
+	uiChangeView = "tab",
 	
 	toggleFullscreen = "f11",
 	scaleUp = "f10",

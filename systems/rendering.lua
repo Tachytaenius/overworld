@@ -165,8 +165,8 @@ function rendering:draw()
 	if cameraEntity.inventory and cameraEntity.inventory.isOpen then
 		self:drawInventoryGrid(6, 6, 1, 1, {cameraEntity.inventory.currentItem})
 		if self:getWorld().ui then
-			if self:getWorld().ui.inventoryGrid then
-				self:drawInventoryGrid(unpack(self:getWorld().ui.inventoryGrid))
+			for _, v in pairs(self:getWorld().ui.inventoryGrids) do
+				self:drawInventoryGrid(unpack(v))
 			end
 		end
 	end
