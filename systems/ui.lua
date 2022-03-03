@@ -19,7 +19,7 @@ function ui:update(dt)
 	if not camera or not (camera and camera.inventory.isOpen) then
 		self.currentInventoryGrid, self.currentInventoryGridSelector, self.selectedItem, self.selectedItemPos = nil
 	end
-	if self.changeGrid then
+	if self.changeGrid or not self.currentInventoryGrid then
 		if camera and camera.inventory.isOpen then
 			if not self.currentInventoryGridSelector then
 				self.currentInventoryGridSelector = self.inventoryGrids.cameraInventory and "main"
@@ -62,9 +62,9 @@ function ui:update(dt)
 				end
 			end
 			if not self.selectedItemPos then
-				if self.selectorMove then
+				-- if self.selectorMove then
 					self.selectedItemPos = 1
-				end
+				-- end
 			elseif self.selectorMove == "up" then
 				self.selectedItemPos = math.max(self.selectedItemPos - self.currentInventoryGrid[1], 1)
 			elseif self.selectorMove == "down" then
@@ -99,6 +99,10 @@ function ui:update(dt)
 	
 	if self.selectedItemPos then
 		self.currentInventoryGrid[7] = self.selectedItemPos
+	end
+	
+	for _, v in pairs(self.inventoryGrids) do
+		v[8] = v == self.currentInventoryGrid
 	end
 	
 	self.cameraPickupables = nil

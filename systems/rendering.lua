@@ -17,9 +17,14 @@ local inventoryPaddingBLQuad = love.graphics.newQuad(0, 16, 8, 8, assets.ui.inve
 local inventoryPaddingBQuad = love.graphics.newQuad(8, 16, 8, 8, assets.ui.inventoryTiles)
 local inventoryPaddingBRQuad = love.graphics.newQuad(16, 16, 8, 8, assets.ui.inventoryTiles)
 -- x and y are the top left of the first item square, not the padding
-function rendering:drawInventoryGrid(x, y, width, height, items, itemCount, highlightedItemIndex)
+function rendering:drawInventoryGrid(x, y, width, height, items, itemCount, highlightedItemIndex, isSelectedGrid)
 	itemCount = itemCount or width * height
-	love.graphics.push()
+	love.graphics.push("all")
+	if isSelectedGrid then
+		love.graphics.setColor(1, 1, 1)
+	else
+		love.graphics.setColor(0.5, 0.5, 0.5)
+	end
 	love.graphics.translate(x, y)
 	for y = 0, height - 1 do
 		for x = 0, width - 1 do
@@ -27,8 +32,10 @@ function rendering:drawInventoryGrid(x, y, width, height, items, itemCount, high
 			love.graphics.draw(assets.ui.inventoryTiles, i > itemCount and inventorySlotlessSquareQuad or inventorySlotSquareQuad, x*8, y*8)
 			local item = items[i]
 			if item then
-				if item.item then -- entity, as in the pickupables menu, or just in an inventory?
+				if item.item then -- for variously organised entries
 					item = item.item.val
+				elseif item.val then
+					item = item.val
 				end
 				love.graphics.draw(assets.items[item.type], x*8, y*8)
 			end
