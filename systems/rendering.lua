@@ -17,10 +17,10 @@ local inventoryPaddingBLQuad = love.graphics.newQuad(0, 16, 8, 8, assets.ui.inve
 local inventoryPaddingBQuad = love.graphics.newQuad(8, 16, 8, 8, assets.ui.inventoryTiles)
 local inventoryPaddingBRQuad = love.graphics.newQuad(16, 16, 8, 8, assets.ui.inventoryTiles)
 -- x and y are the top left of the first item square, not the padding
-function rendering:drawInventoryGrid(x, y, width, height, items, itemCount, highlightedItemIndex, isSelectedGrid)
+function rendering:drawInventoryGrid(x, y, width, height, items, itemCount, highlightedItemIndex, showAsSelected)
 	itemCount = itemCount or width * height
 	love.graphics.push("all")
-	if isSelectedGrid then
+	if showAsSelected then
 		love.graphics.setColor(1, 1, 1)
 	else
 		love.graphics.setColor(0.5, 0.5, 0.5)
@@ -170,7 +170,7 @@ function rendering:draw()
 	-- HUD
 	
 	if cameraEntity.inventory and cameraEntity.inventory.isOpen then
-		self:drawInventoryGrid(6, 6, 1, 1, {cameraEntity.inventory.currentItem})
+		self:drawInventoryGrid(6, 6, 1, 1, {cameraEntity.inventory.currentItem}, nil, nil, true)
 		if self:getWorld().ui then
 			for _, v in pairs(self:getWorld().ui.inventoryGrids) do
 				self:drawInventoryGrid(unpack(v))

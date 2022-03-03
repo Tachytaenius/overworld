@@ -10,7 +10,11 @@ function ui:update(dt)
 	self.inventoryGrids = {}
 	
 	if camera then
-		self.inventoryGrids.cameraInventory = {128, 20, 10, 10, camera.inventory.items, camera.inventory.capacity}
+		local cameraInventoryItems = {}
+		for i, v in ipairs(camera.inventory.items) do
+			cameraInventoryItems[i] = v
+		end
+		self.inventoryGrids.cameraInventory = {128, 20, 10, 10, cameraInventoryItems, camera.inventory.capacity}
 	end
 	if self.cameraPickupables then
 		self.inventoryGrids.cameraPickupables = {20, 20, 10, 10, self.cameraPickupables, #self.cameraPickupables}
@@ -80,19 +84,29 @@ function ui:update(dt)
 		end
 	end
 	
-	if self.select then
-		if self.currentInventoryGridSelector == "pickupables" and self.selectedItem then
+	if self.select and self.selectedItem then
+		local moved = false
+		if self.currentInventoryGridSelector == "pickupables" then
 			if self:getWorld().inventory:giveItem(camera, self.selectedItem) then
-				table.remove(self.currentInventoryGrid[5], self.selectedItemPos)
 				self:getWorld():removeEntity(self.selectedItem)
-				self.selectedItem.taken = true -- necessary?
-				if #self.currentInventoryGrid[5] > 0 then
-					self.selectedItemPos = math.min(self.selectedItemPos, #self.currentInventoryGrid[5])
-					self.selectedItem = self.currentInventoryGrid[5][self.selectedItemPos]
-				else
-					self.selectedItem = nil
-					self.selectedItemPos = nil
-				end
+				moved = true
+			end
+		elseif self.currentInventoryGridSelector == "main" then
+			if camera.position then
+				local item = self:getWorld().inventory:takeItem(camera, self.selectedItem)
+				self:getWorld().map:addItemToWorld(camera.position.x, camera.position.y, item)
+				moved = true
+			end
+		end
+		if moved then
+			table.remove(self.currentInventoryGrid[5], self.selectedItemPos)
+			self.selectedItem.moved = true -- necessary?
+			if #self.currentInventoryGrid[5] > 0 then
+				self.selectedItemPos = math.min(self.selectedItemPos, #self.currentInventoryGrid[5])
+				self.selectedItem = self.currentInventoryGrid[5][self.selectedItemPos]
+			else
+				self.selectedItem = nil
+				self.selectedItemPos = nil
 			end
 		end
 	end

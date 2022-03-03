@@ -83,12 +83,19 @@ function map:newWorld(width, height)
 	end
 end
 
-function map:addItemToTile(x, y, item)
-	local x2, y2 =
-	  (x + love.math.random()) * consts.tileSize,
-	  (y + love.math.random()) * consts.tileSize
-	local entityToAdd = concord.entity():assemble(assemblages.item, x2, y2, item)
+function map:addItemToWorld(x, y, item)
+	if item.__isComponent then
+		item = item.val
+	end
+	local entityToAdd = concord.entity():assemble(assemblages.item, x, y, item)
 	self:getWorld():addEntity(entityToAdd)
+end
+
+function map:addItemToTile(tileX, tileY, item)
+	local x, y =
+	  (tileX + love.math.random()) * consts.tileSize,
+	  (tileY + love.math.random()) * consts.tileSize
+	self:addItemToWorld(x, y, item)
 end
 
 -- NOTE in case it changes: this method is mentioned in registry/tileTypes.lua as the place where tiles turn to items

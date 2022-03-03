@@ -38,15 +38,29 @@ function inventory:update(dt)
 	self:getWorld().wills.pickupables = pickupables -- for AIs. sent every frame so not cleared in wills.lua
 end
 
-function inventory:giveItem(e, item) -- returns success as boolean.
+function inventory:giveItem(e, item) -- returns success as boolean
 	if item.item then -- dropped item entity was passed
-		if item.taken then return false end
+		if item.moved then return false end
 		item = item.item
 	end
 	if not e.inventory then return false end
 	if not (#e.inventory.items < e.inventory.capacity) then return false end
 	e.inventory.items[#e.inventory.items + 1] = item
 	return true -- use this to remove the item from wherever it is being taken from
+end
+
+function inventory:takeItem(e, item) -- returns item if successful, false if not
+	if not e.inventory then return false end
+	local place
+	for i = 1, #e.inventory.items do
+		if e.inventory.items[i] == item then
+			place = i
+		end
+	end
+	if not place then return false end
+	local item2 = table.remove(e.inventory.items, place)
+	assert(item == item2)
+	return item2
 end
 
 return inventory
