@@ -78,6 +78,13 @@ function map:newWorld(width, height)
 					end
 				end
 			end
+			if love.math.random() * 8 < vegetation then
+				if not tileTypes[type].collision then
+					if love.math.random() < 0.75 then
+						self:addItemToTile(x, y, "stick")
+					end
+				end
+			end
 			column[y] = tile
 		end
 	end

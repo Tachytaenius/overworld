@@ -8,7 +8,8 @@ local itemTypes = {
 	},
 	
 	pebble = {},
-	cobble = {}
+	cobble = {},
+	stick = {}
 }
 
 return itemTypes

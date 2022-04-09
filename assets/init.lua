@@ -15,7 +15,8 @@ local assets = {
 		stoneAxe = newImage("assets/items/stoneAxe.png"),
 		stonePickaxe = newImage("assets/items/stonePickaxe.png"),
 		cobble = newImage("assets/items/cobble.png"),
-		pebble = newImage("assets/items/pebble.png")
+		pebble = newImage("assets/items/pebble.png"),
+		stick = newImage("assets/items/stick.png")
 	},
 	terrain = {
 		damage = {
