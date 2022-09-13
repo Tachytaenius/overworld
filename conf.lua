@@ -4,8 +4,8 @@ local settings = require("settings")
 -- settings("load")
 
 function love.conf(t)
-	t.title = "Big Snuggle-Wolfie"
-	-- t.identity = "bigsnugglewolfie"
+	t.title = "Tachy's Top-Down Game Test"
+	-- t.identity = "tachytopdowngametest"
 	t.appendidentity = true
 	t.version = "11.3"
 	-- t.window.icon = "icon.png"
