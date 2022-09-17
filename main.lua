@@ -52,7 +52,7 @@ end
 
 function love.draw()
 	world:emit("draw")
-	love.graphics.draw(world.rendering.output,
+	love.graphics.draw(world.rendering.outputCanvas,
 	  love.graphics.getWidth()/2 - (consts.gameCanvasWidth*settings.graphics.scale)/2, -- topLeftX == centreX - width/2
 	  love.graphics.getHeight()/2 - (consts.gameCanvasHeight*settings.graphics.scale)/2,
 	  0, settings.graphics.scale

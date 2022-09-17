@@ -62,8 +62,10 @@ function rendering:drawInventoryGrid(x, y, width, height, items, itemCount, high
 end
 
 function rendering:init()
-	self.output = love.graphics.newCanvas(consts.gameCanvasWidth, consts.gameCanvasHeight)
+	self.preCrushCanvas = love.graphics.newCanvas(consts.preCrushCanvasWidth, consts.preCrushCanvasHeight)
+	self.outputCanvas = love.graphics.newCanvas(consts.gameCanvasWidth * 2, consts.gameCanvasHeight * 2)
 	-- self.depthShader = love.graphics.newShader("shaders/depth.glsl")
+	self.crushShader = love.graphics.newShader("shaders/crush.glsl")
 end
 
 -- tileLayer = 0 -- The world tiles
@@ -74,7 +76,7 @@ end
 -- UILayer = 5 -- Inventory etc
 
 function rendering:draw()
-	love.graphics.setCanvas({self.output, depth = true})
+	love.graphics.setCanvas({self.preCrushCanvas, depth = true})
 	-- love.graphics.setShader(self.depthShader)
 	love.graphics.clear()
 	
@@ -83,29 +85,29 @@ function rendering:draw()
 	local world = self:getWorld()
 	-- NOTE: The maths here could really do with being simplified.
 	-- love.graphics.translate(
-	-- 	math.max(-(world.map.width * consts.tileSize - consts.gameCanvasWidth), math.min(0, math.round(-cameraEntity.position.x + consts.gameCanvasWidth / 2))),
-	-- 	math.max(-(world.map.height * consts.tileSize - consts.gameCanvasHeight), math.min(0, math.round(-cameraEntity.position.y + consts.gameCanvasHeight / 2)))
+	-- 	math.max(-(world.map.width * consts.tileSize - consts.preCrushCanvasWidth), math.min(0, math.round(-cameraEntity.position.x + consts.preCrushCanvasWidth / 2))),
+	-- 	math.max(-(world.map.height * consts.tileSize - consts.preCrushCanvasHeight), math.min(0, math.round(-cameraEntity.position.y + consts.preCrushCanvasHeight / 2)))
 	-- )
 	love.graphics.translate(
-		math.round(-cameraEntity.position.x + consts.gameCanvasWidth / 2),
-		math.round(-cameraEntity.position.y + consts.gameCanvasHeight / 2)
+		math.round(-cameraEntity.position.x + consts.preCrushCanvasWidth / 2),
+		math.round(-cameraEntity.position.y + consts.preCrushCanvasHeight / 2)
 	)
 	-- love.graphics.scale(4/16)
 	
 	local world = self:getWorld()
 	-- for
-	--   x = math.max(0, math.floor((cameraEntity.position.x - consts.gameCanvasWidth / 2) / consts.tileSize)),
-	--   math.min(world.map.width - 1, math.floor((cameraEntity.position.x + consts.gameCanvasWidth / 2) / consts.tileSize))
+	--   x = math.max(0, math.floor((cameraEntity.position.x - consts.preCrushCanvasWidth / 2) / consts.tileSize)),
+	--   math.min(world.map.width - 1, math.floor((cameraEntity.position.x + consts.preCrushCanvasWidth / 2) / consts.tileSize))
 	-- do
 	-- 	for
-	-- 	  y = math.max(0, math.floor((cameraEntity.position.y - consts.gameCanvasHeight / 2) / consts.tileSize)),
-	-- 	  math.min(world.map.height - 1, math.floor((cameraEntity.position.y + consts.gameCanvasHeight / 2) / consts.tileSize))
+	-- 	  y = math.max(0, math.floor((cameraEntity.position.y - consts.preCrushCanvasHeight / 2) / consts.tileSize)),
+	-- 	  math.min(world.map.height - 1, math.floor((cameraEntity.position.y + consts.preCrushCanvasHeight / 2) / consts.tileSize))
 	-- 	do
 	-- self.depthShader:send("z", tileLayer)
-	for x0 = cameraEntity.position.x - consts.gameCanvasWidth / 2, cameraEntity.position.x + consts.gameCanvasWidth / 2, consts.tileSize do
+	for x0 = cameraEntity.position.x - consts.preCrushCanvasWidth / 2, cameraEntity.position.x + consts.preCrushCanvasWidth / 2, consts.tileSize do
 	-- for x = 0, world.map.width - 1 do
 		local x = math.floor(x0 / consts.tileSize) % world.map.width
-		for y0 = cameraEntity.position.y - consts.gameCanvasHeight, cameraEntity.position.y + consts.gameCanvasHeight, consts.tileSize do
+		for y0 = cameraEntity.position.y - consts.preCrushCanvasHeight, cameraEntity.position.y + consts.preCrushCanvasHeight, consts.tileSize do
 		-- for y = 0, world.map.height - 1 do
 			local y = math.floor(y0 / consts.tileSize) % world.map.height
 			local tile = world.map.tiles[x][y]
@@ -165,7 +167,19 @@ function rendering:draw()
 	end
 	
 	love.graphics.origin()
-	-- love.graphics.setShader()
+	
+	love.graphics.setShader(self.crushShader)
+	love.graphics.setCanvas(self.outputCanvas)
+	self.crushShader:send("inputCanvasSize", {self.preCrushCanvas:getDimensions()})
+	self.crushShader:send("outputCanvasSize", {consts.gameCanvasWidth, consts.gameCanvasHeight})
+	self.crushShader:send("crushCentre", {self.preCrushCanvas:getWidth() / 2, self.preCrushCanvas:getHeight() / 2})
+	self.crushShader:send("crushStart", consts.crushStart)
+	local log1 = math.log(math.min(self.preCrushCanvas:getDimensions()) / consts.crushStart)
+	local log2 = math.log(math.min(consts.gameCanvasWidth, consts.gameCanvasHeight) / consts.crushStart)
+	local power = log1 / log2
+	self.crushShader:send("power", power)
+	love.graphics.draw(self.preCrushCanvas)
+	love.graphics.setShader()
 	
 	-- HUD
 	
