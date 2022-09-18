@@ -63,9 +63,10 @@ end
 
 function rendering:init()
 	self.preCrushCanvas = love.graphics.newCanvas(consts.preCrushCanvasWidth, consts.preCrushCanvasHeight)
+	self.preCrushCanvas:setWrap("clampzero")
 	self.outputCanvas = love.graphics.newCanvas(consts.gameCanvasWidth * 2, consts.gameCanvasHeight * 2)
 	-- self.depthShader = love.graphics.newShader("shaders/depth.glsl")
-	self.crushShader = love.graphics.newShader("shaders/crush.glsl")
+	self.crushAndClipShader = love.graphics.newShader("shaders/crushAndClip.glsl")
 end
 
 -- tileLayer = 0 -- The world tiles
@@ -168,16 +169,19 @@ function rendering:draw()
 	
 	love.graphics.origin()
 	
-	love.graphics.setShader(self.crushShader)
+	love.graphics.setShader(self.crushAndClipShader)
 	love.graphics.setCanvas(self.outputCanvas)
-	self.crushShader:send("inputCanvasSize", {self.preCrushCanvas:getDimensions()})
-	self.crushShader:send("outputCanvasSize", {consts.gameCanvasWidth, consts.gameCanvasHeight})
-	self.crushShader:send("crushCentre", {self.preCrushCanvas:getWidth() / 2, self.preCrushCanvas:getHeight() / 2})
-	self.crushShader:send("crushStart", consts.crushStart)
-	local log1 = math.log(math.min(self.preCrushCanvas:getDimensions()) / consts.crushStart)
-	local log2 = math.log(math.min(consts.gameCanvasWidth, consts.gameCanvasHeight) / consts.crushStart)
+	love.graphics.clear()
+	self.crushAndClipShader:send("inputCanvasSize", {self.preCrushCanvas:getDimensions()})
+	self.crushAndClipShader:send("outputCanvasSize", {consts.gameCanvasWidth, consts.gameCanvasHeight})
+	self.crushAndClipShader:send("crushCentre", {self.preCrushCanvas:getWidth() / 2, self.preCrushCanvas:getHeight() / 2})
+	self.crushAndClipShader:send("crushStart", consts.crushStart)
+	local crushEnd = math.min(consts.gameCanvasWidth, consts.gameCanvasHeight) / 2
+	self.crushAndClipShader:send("crushEnd", crushEnd)
+	local log1 = math.log(math.min(self.preCrushCanvas:getDimensions()) / 2 / consts.crushStart)
+	local log2 = math.log(crushEnd / consts.crushStart)
 	local power = log1 / log2
-	self.crushShader:send("power", power)
+	self.crushAndClipShader:send("power", power)
 	love.graphics.draw(self.preCrushCanvas)
 	love.graphics.setShader()
 	
